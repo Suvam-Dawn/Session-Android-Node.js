@@ -4,6 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -13,28 +15,31 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.suvamdawn.session.helper.Cookie;
+import com.suvamdawn.session.helper.GlobalApplication;
+import com.suvamdawn.session.helper.StringRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    TextView detailName,id;
+    TextView detailName,sid;
     Button setSession,get;
     EditText userName;
     public static String baseURL="http://192.168.0.101:3000";
+    @SuppressWarnings("unchecked")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        new Cookie(MainActivity.this);
         userName=findViewById(R.id.userName);
         setSession=findViewById(R.id.setSession);
         get=findViewById(R.id.get);
-        detailName=findViewById(R.id.userName);
-        id=findViewById(R.id.sid);
+        detailName=findViewById(R.id.detailName);
+        sid=findViewById(R.id.sid);
         setSession.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -44,10 +49,9 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("SessionResponse:",response);
                         try {
                             JSONObject res=new JSONObject(response);
-                            Log.d("SessionResponse:",res.getString("id"));
-                            Log.d("SessionResponse:",res.getString("name"));
                             if(res.getString("id")!=""){
                                 get.setEnabled(true);
+                                setSession.setVisibility(View.GONE);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -72,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                         return params;
                     }
                 };
-                MySingleton.getmInstance(MainActivity.this).addTorequestque(stringRequest);
+                GlobalApplication.get(MainActivity.this).getRequestQueue().add(stringRequest);
             }
         });
         get.setOnClickListener(new View.OnClickListener() {
@@ -81,16 +85,13 @@ public class MainActivity extends AppCompatActivity {
                 StringRequest stringRequest = new StringRequest(Request.Method.POST, baseURL+"/getSession", new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d("SessionResponse:",response);
                         try {
                             JSONObject res=new JSONObject(response);
-                            Log.d("SessionResponse:",res.getString("id"));
-                            Log.d("SessionResponse:",res.getString("name"));
                             if(res.getString("id")!=""){
-                                id.setText(res.getString("id"));
+                                sid.setText("Session ID : "+res.getString("id"));
                             }
                             if(res.getString("name")!=""){
-                                detailName.setText(res.getString("name"));
+                                detailName.setText("Name : "+res.getString("name"));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
                         return params;
                     }
                 };
-                MySingleton.getmInstance(MainActivity.this).addTorequestque(stringRequest);
+                GlobalApplication.get(MainActivity.this).getRequestQueue().add(stringRequest);
             }
         });
     }
