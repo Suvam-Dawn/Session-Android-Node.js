@@ -19,7 +19,8 @@ app.use(
 
 app.use(cookieParser());
 
-app.use("/", (req, res, next) => {
+app.get("/", (req, res, next) => {
+  console.log("hi");
   res.send(
     "Welcome Session_Android_Node.js Application.<br/> DEVELOPED BY SUVAM DAWN"
   );
