@@ -20,10 +20,32 @@ app.use(
 app.use(cookieParser());
 
 app.use("/", (req, res, next) => {
-      res.send("Welcome Session_Android_Node.js Application.<br/> DEVELOPED BY SUVAM DAWN");
+  res.send(
+    "Welcome Session_Android_Node.js Application.<br/> DEVELOPED BY SUVAM DAWN"
+  );
 });
 
-
+app.post("/setSession", (req, res) => {
+  req.session.userName = req.body.name;
+  console.log({
+    id: req.sessionID,
+    name: req.session.userName
+  });
+  res.send({
+    id: req.sessionID,
+    name: req.session.userName
+  });
+});
+app.post("/getSession", (req, res) => {
+  console.log({
+    id: req.sessionID,
+    name: req.session.userName
+  });
+  res.send({
+    id: req.sessionID,
+    name: req.session.userName
+  });
+});
 app.use(function(req, res, next) {
   var err = new Error("Not Found");
   err.status = 404;
